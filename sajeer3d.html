@@ -1,0 +1,2200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sajeer EK - 3D Portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10.2.0/swiper-bundle.min.css">
+    <style>
+        :root {
+            --primary-color: #0ff;
+            --secondary-color: #f0f;
+            --tertiary-color: #0ff;
+            --background-color: #0c0c16;
+            --dark-bg-color: #080810;
+            --card-bg-color: rgba(15, 15, 30, 0.7);
+            --text-color: #fff;
+        }
+        
+        @font-face {
+            font-family: 'Cyberpunk';
+            src: url('https://cdn.jsdelivr.net/npm/cyberpunk-font@1.0.0/Cyberpunk.woff2') format('woff2');
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(5, 5, 20, 0.3) 2%, transparent 6%),
+                radial-gradient(circle at 75% 75%, rgba(5, 5, 20, 0.3) 2%, transparent 6%),
+                linear-gradient(to bottom, var(--background-color), var(--dark-bg-color));
+            background-size: 50px 50px, 50px 50px, 100% 100%;
+            background-attachment: fixed;
+        }
+        
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.7;
+        }
+        
+        .section {
+            min-height: 100vh;
+            padding: 80px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .canvas-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header & Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .header-scrolled {
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+        
+        .logo {
+            font-family: 'Cyberpunk', sans-serif;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover {
+            text-shadow: 0 0 20px var(--primary-color);
+        }
+        
+        .nav-link {
+            position: relative;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+        
+        .nav-link.active::after {
+            width: 100%;
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            cursor: pointer;
+            z-index: 1001;
+        }
+        
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100vh;
+            background-color: rgba(15, 15, 30, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            padding-top: 80px;
+            overflow-y: auto;
+        }
+        
+        .mobile-menu.active {
+            right: 0;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+        
+        .mobile-menu-overlay.active {
+            display: block;
+        }
+        
+        /* Hero Section */
+        #home {
+            display: flex;
+            align-items: center;
+            padding-top: 150px;
+            padding-bottom: 80px;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-content h1 {
+            font-family: 'Cyberpunk', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            position: relative;
+            display: inline-block;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+        
+        .hero-content p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+        
+        .hero-content .typed {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .hero-model {
+            position: relative;
+            z-index: 0;
+        }
+        
+        /* Button Styles */
+        .btn-primary, .btn-secondary {
+            padding: 10px 30px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            z-index: 1;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: var(--background-color);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
+        }
+        
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .btn-primary:hover::after {
+            opacity: 1;
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
+        }
+        
+        /* Section Headers */
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            position: relative;
+            display: inline-block;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            font-family: 'Cyberpunk', sans-serif;
+        }
+        
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        .section-header p {
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        /* Card Styles */
+        .card {
+            background-color: var(--card-bg-color);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), transparent 80%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card:hover::before {
+            opacity: 1;
+        }
+        
+        /* About Section */
+        .about-img {
+            position: relative;
+        }
+        
+        .about-img::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            z-index: -1;
+        }
+        
+        .about-img img {
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .about-img:hover img {
+            transform: scale(1.03);
+        }
+        
+        .about-content h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .about-content p {
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+        
+        .about-info {
+            margin-top: 20px;
+        }
+        
+        .about-info-item {
+            margin-bottom: 15px;
+        }
+        
+        .about-info-item i {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-right: 10px;
+        }
+        
+        /* Facts Section */
+        .fact-item {
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .fact-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .fact-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        
+        .fact-text {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        /* Skills Section */
+        .skill-item {
+            margin-bottom: 30px;
+        }
+        
+        .skill-name {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .skill-name h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .skill-bar {
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .skill-progress {
+            height: 100%;
+            border-radius: 5px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            position: relative;
+            width: 0;
+            transition: width 1.5s ease;
+        }
+        
+        /* Experience Section */
+        .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -1.5px;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+        
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+            box-sizing: border-box;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: var(--background-color);
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            top: 24px;
+            z-index: 1;
+            box-shadow: 0 0 10px var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        
+        .timeline-item:hover::after {
+            transform: scale(1.3);
+            box-shadow: 0 0 20px var(--primary-color);
+        }
+        
+        .timeline-left {
+            left: 0;
+        }
+        
+        .timeline-right {
+            left: 50%;
+        }
+        
+        .timeline-left::after {
+            right: -13px;
+        }
+        
+        .timeline-right::after {
+            left: -13px;
+        }
+        
+        .timeline-content {
+            padding: 20px;
+            background-color: var(--card-bg-color);
+            border-radius: 10px;
+            position: relative;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .timeline-content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .timeline-date {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .timeline-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .timeline-location {
+            font-style: italic;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        /* Services Section */
+        .service-item {
+            text-align: center;
+            padding: 30px 20px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .service-icon::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                opacity: 0.7;
+            }
+            70% {
+                transform: scale(1.1);
+                opacity: 0.3;
+            }
+            100% {
+                transform: scale(0.95);
+                opacity: 0.7;
+            }
+        }
+        
+        .service-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .service-description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.7;
+        }
+        
+        /* Portfolio Section */
+        .portfolio-filters {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .portfolio-filter {
+            padding: 8px 20px;
+            margin: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        
+        .portfolio-filter:hover {
+            background-color: rgba(0, 255, 255, 0.2);
+        }
+        
+        .portfolio-filter.active {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: var(--background-color);
+            font-weight: 600;
+        }
+        
+        .portfolio-item {
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .portfolio-item.show {
+            display: block;
+        }
+        
+        .portfolio-img {
+            overflow: hidden;
+            position: relative;
+            border-radius: 10px;
+        }
+        
+        .portfolio-img img {
+            transition: all 0.5s ease;
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        .portfolio-info {
+            position: absolute;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            transition: all 0.3s ease;
+            border-radius: 0 0 10px 10px;
+        }
+        
+        .portfolio-item:hover .portfolio-info {
+            bottom: 0;
+        }
+        
+        .portfolio-item:hover .portfolio-img img {
+            transform: scale(1.1);
+        }
+        
+        .portfolio-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .portfolio-category {
+            font-style: italic;
+            color: var(--primary-color);
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+            border-radius: 10px;
+            margin: 50px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 255, 255, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255, 0, 255, 0.2) 0%, transparent 40%);
+            z-index: -1;
+        }
+        
+        .cta-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+        
+        /* Testimonials Section */
+        .testimonial-container {
+            padding: 20px 0;
+            position: relative;
+        }
+        
+        .testimonial-item {
+            background-color: var(--card-bg-color);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            height: 100%;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .testimonial-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .testimonial-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid var(--primary-color);
+            margin: 0 auto 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .testimonial-item:hover .testimonial-img {
+            border-color: var(--secondary-color);
+            transform: scale(1.1);
+        }
+        
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 20px;
+            line-height: 1.7;
+            position: relative;
+        }
+        
+        .testimonial-text::before, .testimonial-text::after {
+            content: '"';
+            font-size: 2rem;
+            color: var(--primary-color);
+            position: absolute;
+            opacity: 0.3;
+        }
+        
+        .testimonial-text::before {
+            top: -10px;
+            left: -5px;
+        }
+        
+        .testimonial-text::after {
+            bottom: -25px;
+            right: -5px;
+        }
+        
+        .testimonial-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .testimonial-position {
+            color: var(--primary-color);
+            font-style: italic;
+        }
+        
+        /* Contact Section */
+        .contact-info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+        
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            font-size: 1.5rem;
+            color: var(--background-color);
+            margin-right: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-info-item:hover .contact-icon {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+        
+        .contact-info-content h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .contact-info-content p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .contact-form .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .contact-form .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        
+        .contact-form .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        .contact-form .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .contact-form textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark-bg-color);
+            padding: 30px 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .footer-content {
+            padding: 20px 0;
+        }
+        
+        .footer-text {
+            margin-bottom: 20px;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .social-link:hover {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--background-color);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--background-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+        
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .timeline::after {
+                left: 31px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+            
+            .timeline-left::after, .timeline-right::after {
+                left: 18px;
+            }
+            
+            .timeline-right {
+                left: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            
+            .section-header h2 {
+                font-size: 2rem;
+            }
+            
+            .about-img {
+                margin-bottom: 30px;
+            }
+            
+            .fact-item {
+                margin-bottom: 30px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+            
+            .section-header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .portfolio-filter {
+                font-size: 0.9rem;
+                padding: 6px 15px;
+            }
+        }
+        
+        /* Animation Effects */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background-color: var(--background-color);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--primary-color), var(--secondary-color));
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(var(--secondary-color), var(--primary-color));
+        }
+        
+        /* Loader */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--background-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loader-content {
+            text-align: center;
+        }
+        
+        .loader-spinner {
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: var(--primary-color);
+            border-top-color: var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .loader-text {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            font-family: 'Cyberpunk', sans-serif;
+        }
+        
+        /* 3D Effect Classes */
+        .tilt-element {
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+        
+        .hover-float {
+            transition: transform 0.3s ease;
+        }
+        
+        .hover-float:hover {
+            transform: translateY(-10px);
+        }
+        
+        .neon-border {
+            border: 1px solid transparent;
+            border-image: linear-gradient(90deg, var(--primary-color), var(--secondary-color)) 1;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 10px var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .glass-effect {
+            background-color: rgba(15, 15, 30, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .swiper-pagination-bullet {
+            background-color: rgba(255, 255, 255, 0.5) !important;
+        }
+        
+        .swiper-pagination-bullet-active {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)) !important;
+        }
+        
+        .swiper-button-next, .swiper-button-prev {
+            color: var(--primary-color) !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Loading Sajeer's Portfolio...</div>
+        </div>
+    </div>
+    
+    <!-- 3D Background -->
+    <div id="canvas-container"></div>
+    
+    <!-- Header -->
+    <header id="header" class="py-4">
+        <div class="container flex items-center justify-between">
+            <a href="#" class="logo">SAJEER EK</a>
+            
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex">
+                <ul class="flex space-x-6">
+                    <li><a href="#home" class="nav-link active">Home</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                    <li><a href="#skills" class="nav-link">Skills</a></li>
+                    <li><a href="#experience" class="nav-link">Experience</a></li>
+                    <li><a href="#services" class="nav-link">Services</a></li>
+                    <li><a href="#portfolio" class="nav-link">Portfolio</a></li>
+                    <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <!-- Mobile Menu Button -->
+            <div class="mobile-menu-btn md:hidden">
+                <i class="fas fa-bars text-2xl text-white"></i>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu">
+        <ul class="p-5 space-y-4">
+            <li><a href="#home" class="block p-2 nav-link">Home</a></li>
+            <li><a href="#about" class="block p-2 nav-link">About</a></li>
+            <li><a href="#skills" class="block p-2 nav-link">Skills</a></li>
+            <li><a href="#experience" class="block p-2 nav-link">Experience</a></li>
+            <li><a href="#services" class="block p-2 nav-link">Services</a></li>
+            <li><a href="#portfolio" class="block p-2 nav-link">Portfolio</a></li>
+            <li><a href="#testimonials" class="block p-2 nav-link">Testimonials</a></li>
+            <li><a href="#contact" class="block p-2 nav-link">Contact</a></li>
+        </ul>
+    </div>
+    <div class="mobile-menu-overlay"></div>
+    
+    <!-- Hero Section -->
+    <section id="home" class="section">
+        <div class="container">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="hero-content md:w-1/2 mb-10 md:mb-0 fade-in-up" style="animation-delay: 0.2s;">
+                    <h1>Hello, I'm<br>SAJEER EK</h1>
+                    <p class="my-5">
+                        E-commerce Manager with 10+ years in the UAE market, skilled in driving sales growth, cost optimization, and customer satisfaction. Experienced in strategies for product visibility, campaign management, and content creation.
+                    </p>
+                    <div class="mt-8">
+                        <a href="#contact" class="btn-primary mr-4">Get In Touch</a>
+                        <a href="#portfolio" class="btn-secondary">View Portfolio</a>
+                    </div>
+                </div>
+                <div class="hero-model md:w-1/2 relative fade-in" style="animation-delay: 0.4s;">
+                    <div id="hero-3d-model" class="w-full h-96"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <h2>About Me</h2>
+                <p>Learn more about my professional background and expertise in e-commerce management</p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row">
+                <div class="md:w-1/2 mb-10 md:mb-0 fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="about-img tilt-element">
+                        <img src="https://cdn.jsdelivr.net/gh/themewagon/portfoilo-tailwind/dist/assets/img/about-img.jpg" alt="Sajeer EK" class="w-full h-auto">
+                    </div>
+                </div>
+                
+                <div class="md:w-1/2 md:pl-10 fade-in-up" style="animation-delay: 0.4s;">
+                    <div class="about-content">
+                        <h3>An Accomplished E-commerce Professional</h3>
+                        <p>
+                            An accomplished E-commerce Manager with over 10 years of experience in e-commerce development and vendor relationship management. Proven track record in driving sales growth, improving cost efficiency, and enhancing customer satisfaction. Adept at implementing innovative strategies to boost product visibility, with expertise in campaign management, promotional strategies, and creating engaging banners and videos.
+                        </p>
+                        <p>
+                            Currently serving as Chief Operating Officer at Awamir General Trading, responsible for developing and executing comprehensive business strategies to achieve both short-term and long-term goals.
+                        </p>
+                        
+                        <div class="about-info grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                            <div class="about-info-item">
+                                <i class="fas fa-globe"></i>
+                                <span><strong>Website:</strong> www.sajeereklive.com</span>
+                            </div>
+                            <div class="about-info-item">
+                                <i class="fas fa-building"></i>
+                                <span><strong>Organization:</strong> Awamir General Trading</span>
+                            </div>
+                            <div class="about-info-item">
+                                <i class="fas fa-phone"></i>
+                                <span><strong>Phone:</strong> +971585167705</span>
+                            </div>
+                            <div class="about-info-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span><strong>Location:</strong> Dubai, UAE</span>
+                            </div>
+                            <div class="about-info-item">
+                                <i class="fas fa-briefcase"></i>
+                                <span><strong>Experience:</strong> 10+ Years</span>
+                            </div>
+                            <div class="about-info-item">
+                                <i class="fas fa-envelope"></i>
+                                <span><strong>Email:</strong> sajeermca@gmail.com</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-16">
+                <h3 class="text-2xl font-bold mb-6 text-center neon-text">E-commerce Expertise</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+                    <div class="card p-6 fade-in-up hover-float" style="animation-delay: 0.2s;">
+                        <i class="fas fa-shopping-cart text-4xl mb-4 neon-text"></i>
+                        <h4 class="text-lg font-bold mb-2">E-commerce Strategy</h4>
+                        <p class="text-gray-300">Product listing, pricing, inventory management, and seller portal operations.</p>
+                    </div>
+                    
+                    <div class="card p-6 fade-in-up hover-float" style="animation-delay: 0.3s;">
+                        <i class="fas fa-bullhorn text-4xl mb-4 neon-text"></i>
+                        <h4 class="text-lg font-bold mb-2">Digital Marketing</h4>
+                        <p class="text-gray-300">Social media management, content creation, lead generation, and campaign planning.</p>
+                    </div>
+                    
+                    <div class="card p-6 fade-in-up hover-float" style="animation-delay: 0.4s;">
+                        <i class="fas fa-chart-line text-4xl mb-4 neon-text"></i>
+                        <h4 class="text-lg font-bold mb-2">SEO and Analytics</h4>
+                        <p class="text-gray-300">Search engine optimization, digital campaign tracking, and data-driven decision-making using tools.</p>
+                    </div>
+                    
+                    <div class="card p-6 fade-in-up hover-float" style="animation-delay: 0.5s;">
+                        <i class="fas fa-users-cog text-4xl mb-4 neon-text"></i>
+                        <h4 class="text-lg font-bold mb-2">Business Operations</h4>
+                        <p class="text-gray-300">Team leadership, cross-functional coordination, business strategy, and ERP software management.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Facts Counter -->
+            <div class="mt-16">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="card fact-item fade-in-up" style="animation-delay: 0.2s;">
+                        <div class="fact-icon">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <h3 class="fact-number counter" data-count="34">34</h3>
+                        <p class="fact-text">E-Commerce Websites Handled</p>
+                    </div>
+                    
+                    <div class="card fact-item fade-in-up" style="animation-delay: 0.3s;">
+                        <div class="fact-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3 class="fact-number counter" data-count="9">9</h3>
+                        <p class="fact-text">Mobile E-Com Apps</p>
+                    </div>
+                    
+                    <div class="card fact-item fade-in-up" style="animation-delay: 0.4s;">
+                        <div class="fact-icon">
+                            <i class="fas fa-smile"></i>
+                        </div>
+                        <h3 class="fact-number counter" data-count="85">85</h3>
+                        <p class="fact-text">Satisfied Clients</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Skills Section -->
+    <section id="skills" class="section">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <h2>My Skills</h2>
+                <p>Proficient in e-commerce management, including seller portal operations, product listings, and inventory control.</p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row flex-wrap">
+                <div class="md:w-1/2 md:pr-10 fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="skill-item">
+                        <div class="skill-name">
+                            <h4>E-commerce management</h4>
+                            <span>100%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-width="100"></div>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-300">Product listings, pricing strategies, inventory management, platform optimization</p>
+                    </div>
+                    
+                    <div class="skill-item">
+                        <div class="skill-name">
+                            <h4>Digital marketing</h4>
+                            <span>90%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-width="90"></div>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-300">Social media, content creation, campaign planning, lead generation</p>
+                    </div>
+                    
+                    <div class="skill-item">
+                        <div class="skill-name">
+                            <h4>SEO and analytics</h4>
+                            <span>75%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-width="75"></div>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-300">Search optimization, performance tracking, analytics tools, data-driven decisions</p>
+                    </div>
+                </div>
+                
+                <div class="md:w-1/2 md:pl-10 fade-in-up" style="animation-delay: 0.4s;">
+                    <div class="skill-item">
+                        <div class="skill-name">
+                            <h4>Website and ERP management</h4>
+                            <span>80%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-width="80"></div>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-300">Website development, ERP implementation, system integrations</p>
+                    </div>
+                    
+                    <div class="skill-item">
+                        <div class="skill-name">
+                            <h4>Business operations</h4>
+                            <span>90%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-width="90"></div>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-300">Team leadership, cross-functional coordination, strategy development</p>
+                    </div>
+                    
+                    <div class="skill-item">
+                        <div class="skill-name">
+                            <h4>Internal coordination</h4>
+                            <span>55%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-width="55"></div>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-300">Project management, team collaboration, resource allocation</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CTA Section -->
+            <div class="cta-section fade-in-up mt-16" style="animation-delay: 0.2s;">
+                <h3 class="cta-title">Ready to Elevate Your E-commerce Presence?</h3>
+                <p class="mb-8 text-lg">Let's transform your online business with proven strategies and expertise</p>
+                <a href="#contact" class="btn-primary">Get Started</a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Experience Section -->
+    <section id="experience" class="section">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <h2>Experience & Education</h2>
+                <p>My professional journey and academic qualifications</p>
+            </div>
+            
+            <div class="mb-20">
+                <h3 class="text-2xl font-bold mb-6 fade-in-up neon-text" style="animation-delay: 0.2s;">Professional Journey</h3>
+                
+                <div class="timeline">
+                    <div class="timeline-item timeline-left fade-in-up" style="animation-delay: 0.3s;">
+                        <div class="timeline-content">
+                            <span class="timeline-date">2023 - Present</span>
+                            <h4 class="timeline-title">Chief Operating Officer</h4>
+                            <p class="timeline-location">Awamir General Trading, Al Baraha, Dubai</p>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>Developed and executed comprehensive business strategies to achieve both short-term and long-term goals.</li>
+                                <li>Managed all aspects of business operations including finance, marketing, sales, and human resources.</li>
+                                <li>Led a team of over 7 employees, fostering a collaborative and innovative work environment.</li>
+                                <li>Oversaw product development and launch processes, ensuring high-quality and timely delivery.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item timeline-right fade-in-up" style="animation-delay: 0.4s;">
+                        <div class="timeline-content">
+                            <span class="timeline-date">2020 - 2023</span>
+                            <h4 class="timeline-title">E-commerce Manager | Web Developer</h4>
+                            <p class="timeline-location">Hiphone Telecom, Al Garhoud, Dubai</p>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>Seller Portal Management: Handled various seller portals, including Amazon, Noon, OurShopee, Instashop, Dubai Store, Carrefour, and SharafDG.</li>
+                                <li>Product Listing Management: Managed product listings across multiple e-commerce websites using single and bulk imports.</li>
+                                <li>Marketplace Metrics Analysis: Monitored and analysed marketplace metrics and sales reports to identify fast-moving products.</li>
+                                <li>Campaign Planning: Collaborated with e-commerce buyers to understand product demand and plan campaigns around seasonal sales.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <h3 class="text-2xl font-bold mb-6 fade-in-up neon-text" style="animation-delay: 0.5s;">Educational Background</h3>
+                
+                <div class="timeline">
+                    <div class="timeline-item timeline-left fade-in-up" style="animation-delay: 0.6s;">
+                        <div class="timeline-content">
+                            <span class="timeline-date">2015 - 2017</span>
+                            <h4 class="timeline-title">Master of Philosophy in Computer Science (MPhil)</h4>
+                            <p class="timeline-location">Bharathidasan University</p>
+                            <p>Annai Vailankanni Arts And Science College, Tamilnadu, India</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item timeline-right fade-in-up" style="animation-delay: 0.7s;">
+                        <div class="timeline-content">
+                            <span class="timeline-date">2012 - 2014</span>
+                            <h4 class="timeline-title">Master of Business Administration (MBA)</h4>
+                            <p class="timeline-location">Annamalai University</p>
+                            <p>Tamilnadu, India</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item timeline-left fade-in-up" style="animation-delay: 0.8s;">
+                        <div class="timeline-content">
+                            <span class="timeline-date">2008 - 2011</span>
+                            <h4 class="timeline-title">Master of Computer Application (MCA)</h4>
+                            <p class="timeline-location">University Of Calicut</p>
+                            <p>University Campus, Kerala, India</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Services Section -->
+    <section id="services" class="section">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <h2>Services</h2>
+                <p>My services cover a broad spectrum of e-commerce and digital marketing needs</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="card service-item fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="service-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4 class="service-title">E-commerce Strategy Development</h4>
+                    <p class="service-description">
+                        Craft and execute comprehensive strategies to achieve business goals, focusing on sales growth, cost efficiency, and enhanced customer satisfaction.
+                    </p>
+                </div>
+                
+                <div class="card service-item fade-in-up" style="animation-delay: 0.3s;">
+                    <div class="service-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h4 class="service-title">Multichannel Seller Portal Management</h4>
+                    <p class="service-description">
+                        Manage and optimize seller portals across various platforms such as Amazon, Noon, Carrefour, and more, coordinating team efforts for successful conferences and campaigns.
+                    </p>
+                </div>
+                
+                <div class="card service-item fade-in-up" style="animation-delay: 0.4s;">
+                    <div class="service-icon">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <h4 class="service-title">Product Listing and Inventory Management</h4>
+                    <p class="service-description">
+                        Oversee product listing management across multiple e-commerce websites, including bulk imports and adjustments. Manage pricing, inventory levels, and perform data analysis.
+                    </p>
+                </div>
+                
+                <div class="card service-item fade-in-up" style="animation-delay: 0.5s;">
+                    <div class="service-icon">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <h4 class="service-title">Campaign and Promotional Strategy Planning</h4>
+                    <p class="service-description">
+                        Develop and implement effective marketing campaigns and promotional strategies. Collaborate with e-commerce buyers to plan and execute seasonal and targeted campaigns.
+                    </p>
+                </div>
+                
+                <div class="card service-item fade-in-up" style="animation-delay: 0.6s;">
+                    <div class="service-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h4 class="service-title">Website and Digital Experience Management</h4>
+                    <p class="service-description">
+                        Manage and enhance company websites, integrate payment gateways, and utilize tools like Google Analytics for tracking digital campaigns. Ensure effective SEO practices.
+                    </p>
+                </div>
+                
+                <div class="card service-item fade-in-up" style="animation-delay: 0.7s;">
+                    <div class="service-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h4 class="service-title">ERP Software Management</h4>
+                    <p class="service-description">
+                        Utilize ERP software such as Odoo and Zoho to streamline business management and e-commerce operations, ensuring efficient workflow and operational excellence.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="section">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <h2>Portfolio</h2>
+                <p>I am a seasoned E-commerce Manager with over a decade of experience in e-commerce development and vendor management. My career is marked by a proven track record of driving sales growth, enhancing cost efficiency, and elevating customer satisfaction.</p>
+            </div>
+            
+            <div class="portfolio-filters fade-in-up" style="animation-delay: 0.2s;">
+                <div class="portfolio-filter active" data-filter="*">All</div>
+                <div class="portfolio-filter" data-filter=".b2c">B2C</div>
+                <div class="portfolio-filter" data-filter=".q-commerce">Q-Commerce</div>
+                <div class="portfolio-filter" data-filter=".b2b">B2B</div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 portfolio-container">
+                <div class="portfolio-item tilt-element b2c show fade-in-up" style="animation-delay: 0.3s;">
+                    <div class="portfolio-img">
+                        <img src="https://cdn.jsdelivr.net/gh/themewagon/portfoilo-tailwind/dist/assets/img/portfolio/portfolio-1.jpg" alt="E-commerce Website">
+                        <div class="portfolio-info">
+                            <h4 class="portfolio-title">E-commerce Website</h4>
+                            <p class="portfolio-category">Full-featured online store with multiple payment gateways</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item tilt-element q-commerce show fade-in-up" style="animation-delay: 0.4s;">
+                    <div class="portfolio-img">
+                        <img src="https://cdn.jsdelivr.net/gh/themewagon/portfoilo-tailwind/dist/assets/img/portfolio/portfolio-2.jpg" alt="Quick Commerce App">
+                        <div class="portfolio-info">
+                            <h4 class="portfolio-title">Quick Commerce App</h4>
+                            <p class="portfolio-category">Fast delivery mobile application with real-time tracking</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item tilt-element b2b show fade-in-up" style="animation-delay: 0.5s;">
+                    <div class="portfolio-img">
+                        <img src="https://cdn.jsdelivr.net/gh/themewagon/portfoilo-tailwind/dist/assets/img/portfolio/portfolio-3.jpg" alt="B2B Portal">
+                        <div class="portfolio-info">
+                            <h4 class="portfolio-title">B2B Portal</h4>
+                            <p class="portfolio-category">Wholesale platform connecting businesses with suppliers</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item tilt-element b2c show fade-in-up" style="animation-delay: 0.6s;">
+                    <div class="portfolio-img">
+                        <img src="https://cdn.jsdelivr.net/gh/themewagon/portfoilo-tailwind/dist/assets/img/portfolio/portfolio-4.jpg" alt="Mobile Shopping App">
+                        <div class="portfolio-info">
+                            <h4 class="portfolio-title">Mobile Shopping App</h4>
+                            <p class="portfolio-category">Native mobile application for on-the-go shopping</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item tilt-element b2b show fade-in-up" style="animation-delay: 0.7s;">
+                    <div class="portfolio-img">
+                        <img src="https://cdn.jsdelivr.net/gh/themewagon/portfoilo-tailwind/dist/assets/img/portfolio/portfolio-5.jpg" alt="Analytics Dashboard">
+                        <div class="portfolio-info">
+                            <h4 class="portfolio-title">Analytics Dashboard</h4>
+                            <p class="portfolio-category">Comprehensive business intelligence tool for e-commerce</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="section">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <h2>Testimonials</h2>
+                <p>What industry professionals and clients have to say about my work and contribution to their e-commerce success.</p>
+            </div>
+            
+            <div class="swiper testimonial-swiper fade-in-up" style="animation-delay: 0.2s;">
+                <div class="swiper-wrapper pb-10">
+                    <div class="swiper-slide p-2">
+                        <div class="testimonial-item h-full">
+                            <img src="https://cdn.jsdelivr.net/gh/themewagon/portfoilo-tailwind/dist/assets/img/testimonials/testimonials-1.jpg" alt="Saul Goodman" class="testimonial-img">
+                            <p class="testimonial-text my-4">Exceptional strategist with a knack for driving growth and efficiency. A true asset to any team.</p>
+                            <h4 class="testimonial-name">Saul Goodman</h4>
+                            <p class="testimonial-position">CEO & Founder</p>
+                        </div>
+                    </div>
+                    
+                    <div class="swiper-slide p-2">
+                        <div class="testimonial-item h-full">
+                            <img src="https://cdn.jsdelivr.net/gh/themewagon/portfoilo-tailwind/dist/assets/img/testimonials/testimonials-2.jpg" alt="Sara Wilsson" class="testimonial-img">
+                            <p class="testimonial-text my-4">Remarkable at managing seller portals and optimizing product listings. Results speak for themselves!</p>
+                            <h4 class="testimonial-name">Sara Wilsson</h4>
+                            <p class="testimonial-position">Director</p>
+                        </div>
+                    </div>
+                    
+                    <div class="swiper-slide p-2">
+                        <div class="testimonial-item h-full">
+                            <img src="https://cdn.jsdelivr.net/gh/themewagon/portfoilo-tailwind/dist/assets/img/testimonials/testimonials-3.jpg" alt="Jena Karlis" class="testimonial-img">
+                            <p class="testimonial-text my-4">A campaign expert who delivers innovative and effective promotional strategies. Highly recommended.</p>
+                            <h4 class="testimonial-name">Jena Karlis</h4>
+                            <p class="testimonial-position">Marketing Manager</p>
+                        </div>
+                    </div>
+                    
+                    <div class="swiper-slide p-2">
+                        <div class="testimonial-item h-full">
+                            <img src="https://cdn.jsdelivr.net/gh/themewagon/portfoilo-tailwind/dist/assets/img/testimonials/testimonials-4.jpg" alt="Matt Brandon" class="testimonial-img">
+                            <p class="testimonial-text my-4">Proven track record in website management and digital analytics. An invaluable resource for boosting online presence.</p>
+                            <h4 class="testimonial-name">Matt Brandon</h4>
+                            <p class="testimonial-position">Freelancer</p>
+                        </div>
+                    </div>
+                    
+                    <div class="swiper-slide p-2">
+                        <div class="testimonial-item h-full">
+                            <img src="https://cdn.jsdelivr.net/gh/themewagon/portfoilo-tailwind/dist/assets/img/testimonials/testimonials-5.jpg" alt="John Larson" class="testimonial-img">
+                            <p class="testimonial-text my-4">Efficiently integrated ERP systems and streamlined operations. A game-changer for our business.</p>
+                            <h4 class="testimonial-name">John Larson</h4>
+                            <p class="testimonial-position">Entrepreneur</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <h2>Contact Me</h2>
+                <p>Feel free to reach out if you're interested in discussing how I can help drive your e-commerce success or enhance your digital strategy. I'm excited to explore potential opportunities and collaborate on innovative solutions.</p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row">
+                <div class="md:w-1/2 mb-10 md:mb-0 pr-0 md:pr-6 fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="contact-info-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-info-content">
+                            <h3>Location</h3>
+                            <p>Al Baraha, Dubai, United Arab Emirates</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-info-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-info-content">
+                            <h3>Email</h3>
+                            <p>sajeermca@gmail.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-info-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-info-content">
+                            <h3>Call</h3>
+                            <p>+971 585167705</p>
+                        </div>
+                    </div>
+                    
+                    <div id="contact-map" class="mt-10 h-64 rounded-lg">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3608.1539348273707!2d55.30893897500667!3d25.27512557717308!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f5c3cf96d9607%3A0xc11d9515a4fad47e!2sAl%20Baraha%2C%20Dubai!5e0!3m2!1sen!2sae!4v1698774299413!5m2!1sen!2sae" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                </div>
+                
+                <div class="md:w-1/2 md:pl-6 fade-in-up" style="animation-delay: 0.4s;">
+                    <div class="card p-6">
+                        <form class="contact-form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Your Name" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" class="form-control" placeholder="Your Email" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Subject" required>
+                            </div>
+                            <div class="form-group">
+                                <textarea class="form-control" placeholder="Message" required></textarea>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn-primary w-full">Send Message</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-text">
+                    <h3 class="text-xl font-bold mb-2">SAJEER EK</h3>
+                    <p class="text-gray-400">E-commerce Manager & Digital Marketing Specialist</p>
+                </div>
+                
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                </div>
+                
+                <div class="copyright">
+                    &copy; Copyright <strong>Sajeer EK</strong>. All Rights Reserved
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.156.1/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10.2.0/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.8.0/dist/vanilla-tilt.min.js"></script>
+    <script>
+        // Main JS
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loader after content loads
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1000);
+            
+            // Initialize Three.js Background
+            initThreeJSBackground();
+            
+            // Initialize Hero 3D Model
+            initHero3DModel();
+            
+            // Mobile Menu Toggle
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
+            
+            mobileMenuBtn.addEventListener('click', function() {
+                mobileMenu.classList.toggle('active');
+                mobileMenuOverlay.classList.toggle('active');
+            });
+            
+            mobileMenuOverlay.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                mobileMenuOverlay.classList.remove('active');
+            });
+            
+            // Navigation active state and smooth scrolling
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+            
+            window.addEventListener('scroll', function() {
+                let current = '';
+                
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 100;
+                    const sectionHeight = section.clientHeight;
+                    
+                    if (pageYOffset >= sectionTop && pageYOffset < sectionTop + sectionHeight) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+                
+                // Header scroll state
+                const header = document.getElementById('header');
+                if (window.scrollY > 100) {
+                    header.classList.add('header-scrolled');
+                } else {
+                    header.classList.remove('header-scrolled');
+                }
+                
+                // Back to top button
+                const backToTop = document.querySelector('.back-to-top');
+                if (window.scrollY > 300) {
+                    backToTop.classList.add('active');
+                } else {
+                    backToTop.classList.remove('active');
+                }
+                
+                // Activate skill bars when in view
+                const skillSection = document.getElementById('skills');
+                const skillProgressBars = document.querySelectorAll('.skill-progress');
+                
+                if (isInViewport(skillSection)) {
+                    skillProgressBars.forEach(bar => {
+                        const width = bar.getAttribute('data-width');
+                        bar.style.width = width + '%';
+                    });
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    
+                    window.scrollTo({
+                        top: targetSection.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    if (mobileMenu.classList.contains('active')) {
+                        mobileMenu.classList.remove('active');
+                        mobileMenuOverlay.classList.remove('active');
+                    }
+                });
+            });
+            
+            // Portfolio Filtering
+            const filterButtons = document.querySelectorAll('.portfolio-filter');
+            const portfolioItems = document.querySelectorAll('.portfolio-item');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const filterValue = this.getAttribute('data-filter');
+                    
+                    // Toggle active class
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Filter items
+                    portfolioItems.forEach(item => {
+                        if (filterValue === '*') {
+                            item.classList.add('show');
+                        } else if (item.classList.contains(filterValue.replace('.', ''))) {
+                            item.classList.add('show');
+                        } else {
+                            item.classList.remove('show');
+                        }
+                    });
+                });
+            });
+            
+            // Initialize Swiper for Testimonials
+            const testimonialSwiper = new Swiper('.testimonial-swiper', {
+                slidesPerView: 1,
+                spaceBetween: 20,
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                breakpoints: {
+                    640: {
+                        slidesPerView: 1,
+                        spaceBetween: 20,
+                    },
+                    768: {
+                        slidesPerView: 2,
+                        spaceBetween: 30,
+                    },
+                    1024: {
+                        slidesPerView: 3,
+                        spaceBetween: 30,
+                    },
+                },
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                },
+            });
+            
+            // Initialize Vanilla Tilt
+            VanillaTilt.init(document.querySelectorAll(".tilt-element"), {
+                max: 5,
+                speed: 400,
+                glare: true,
+                "max-glare": 0.2,
+            });
+            
+            // Contact Form Submission
+            const contactForm = document.querySelector('.contact-form');
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Thank you for your message! I will get back to you soon.');
+                contactForm.reset();
+            });
+            
+            // Back to top button click handler
+            const backToTopButton = document.querySelector('.back-to-top');
+            backToTopButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Fade in elements on scroll
+            const fadeElements = document.querySelectorAll('.fade-in-up, .fade-in');
+            const fadeOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -100px 0px"
+            };
+            
+            const fadeObserver = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, fadeOptions);
+            
+            fadeElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                fadeObserver.observe(el);
+            });
+        });
+        
+        // Helper Functions
+        function isInViewport(element) {
+            const rect = element.getBoundingClientRect();
+            return (
+                rect.top <= (window.innerHeight || document.documentElement.clientHeight) &&
+                rect.bottom >= 0
+            );
+        }
+        
+        // Three.js Background
+        function initThreeJSBackground() {
+            const container = document.getElementById('canvas-container');
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+            camera.position.z = 50;
+            
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+            
+            // Create particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 1500;
+            
+            const posArray = new Float32Array(particlesCount * 3);
+            const colorsArray = new Float32Array(particlesCount * 3);
+            
+            for (let i = 0; i < particlesCount * 3; i += 3) {
+                // Positions - random points in a sphere
+                posArray[i] = (Math.random() - 0.5) * 100;
+                posArray[i + 1] = (Math.random() - 0.5) * 100;
+                posArray[i + 2] = (Math.random() - 0.5) * 100;
+                
+                // Colors - cyan to magenta gradient
+                const t = Math.random();
+                colorsArray[i] = t * 1.0; // R: interpolate between 0 and 1
+                colorsArray[i + 1] = (1 - t) * 1.0; // G: interpolate between 1 and 0
+                colorsArray[i + 2] = 1.0; // B: always 1 for a cyan-magenta gradient
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.15,
+                transparent: true,
+                opacity: 0.8,
+                vertexColors: true,
+            });
+            
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+            
+            window.addEventListener('resize', () => {
+                const newWidth = window.innerWidth;
+                const newHeight = window.innerHeight;
+                
+                camera.aspect = newWidth / newHeight;
+                camera.updateProjectionMatrix();
+                
+                renderer.setSize(newWidth, newHeight);
+            });
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Rotate particles slowly
+                particlesMesh.rotation.x += 0.0005;
+                particlesMesh.rotation.y += 0.0005;
+                
+                // Mouse interaction for particles
+                const time = Date.now() * 0.001;
+                particlesMesh.rotation.z = time * 0.05;
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            
+            // Mouse interaction
+            document.addEventListener('mousemove', (event) => {
+                const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+                
+                particlesMesh.rotation.x += mouseY * 0.001;
+                particlesMesh.rotation.y += mouseX * 0.001;
+            });
+        }
+        
+        // Hero 3D Model
+        function initHero3DModel() {
+            const container = document.getElementById('hero-3d-model');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+            camera.position.z = 30;
+            
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+            
+            // Create 3D text-like geometry
+            const sphereGeometry = new THREE.SphereGeometry(10, 32, 32);
+            const sphereMaterial = new THREE.MeshBasicMaterial({
+                color: 0x000000,
+                wireframe: true,
+            });
+            
+            const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            scene.add(sphere);
+            
+            // Add glowing particles inside the sphere
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 800;
+            
+            const posArray = new Float32Array(particlesCount * 3);
+            const colorsArray = new Float32Array(particlesCount * 3);
+            
+            for (let i = 0; i < particlesCount * 3; i += 3) {
+                // Positions - random points in the sphere
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                const r = 9 * Math.random();
+                
+                posArray[i] = r * Math.sin(phi) * Math.cos(theta);
+                posArray[i + 1] = r * Math.sin(phi) * Math.sin(theta);
+                posArray[i + 2] = r * Math.cos(phi);
+                
+                // Colors - cyan to magenta gradient
+                const t = Math.random();
+                colorsArray[i] = t; // R
+                colorsArray[i + 1] = 1 - t; // G
+                colorsArray[i + 2] = 1; // B
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.3,
+                transparent: true,
+                opacity: 0.8,
+                vertexColors: true,
+            });
+            
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+            
+            window.addEventListener('resize', () => {
+                const newWidth = container.clientWidth;
+                const newHeight = container.clientHeight;
+                
+                camera.aspect = newWidth / newHeight;
+                camera.updateProjectionMatrix();
+                
+                renderer.setSize(newWidth, newHeight);
+            });
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Rotate sphere and particles
+                sphere.rotation.y += 0.003;
+                particlesMesh.rotation.y += 0.001;
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            
+            // Interactive elements
+            container.addEventListener('mousemove', (event) => {
+                const rect = container.getBoundingClientRect();
+                const mouseX = ((event.clientX - rect.left) / width) * 2 - 1;
+                const mouseY = -((event.clientY - rect.top) / height) * 2 + 1;
+                
+                sphere.rotation.y = mouseX * 0.5;
+                sphere.rotation.x = mouseY * 0.5;
+                
+                particlesMesh.rotation.y = mouseX * 0.3;
+                particlesMesh.rotation.x = mouseY * 0.3;
+            });
+        }
+    </script>
+</body>
+</html>
